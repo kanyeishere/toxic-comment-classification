@@ -165,7 +165,7 @@ for i in range(epochs):
         print('Epoch: {}, Validation Accuracy: {}, loss: {}'.format(i, accuracy, np.mean(test_losses)))
         if accuracy > 0.97:
             break
-    torch.save(model.state_dict(), 'C:/Users/29142/comp9444/project/toxic-comment-classification/model_save/{}.pkl'.format(epochs))
+    torch.save(model.state_dict(), './model_save/{}.pkl'.format(epochs))
 print(torch.cuda.memory_summary(1))
 
 
