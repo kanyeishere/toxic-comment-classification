@@ -11,7 +11,37 @@ import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 import os
-import torch.nn.functional as F
+from sklearn import metrics
+
+
+def recall_a(output, labels):
+	preds = torch.argmax(output, dim = 1)
+	labels = labels.to(torch.device("cpu")).numpy()
+	preds = preds.to(torch.device("cpu")).numpy()
+	macro = metrics.recall_score(labels, preds, average=None)
+	return macro
+def precision(y_true, y_pred):
+    i = set(y_true).intersection(y_pred)
+    len1 = len(y_pred)
+    if len1 == 0:
+        return 0
+    else:
+        return len(i) / len1
+
+def recall(y_true, y_pred):
+	y_true = y_true.to(torch.device("cpu")).tolist()
+	y_pred = y_pred.to(torch.device("cpu")).tolist()
+	i = set(y_true).intersection(y_pred)
+	return len(i) / len(y_true)
+
+def f1(y_true, y_pred):
+    p = precision(y_true, y_pred)
+    r = recall(y_true, y_pred)
+    if p + r == 0:
+        return 0
+    else:
+        return 2 * (p * r) / (p + r)
+
 ## Data Loading
 
 data_folder_path = './data/'
@@ -28,6 +58,7 @@ for cls in classes:
     rate = df[cls].sum() / total_samples
     rate = np.round(rate*100, 3)
     print(cls +' rate: ', rate, "%")
+
 ## Data cleaning
 def data_cleaning(text):
     # seems that Uppercase words have more effect on toxicity than lowercase.
@@ -114,7 +145,7 @@ for batch in data_loader_train:
     break
 
 
-loss = torch.nn.BCEWithLogitsLoss(pos_weight = torch.tensor((159571 - 35098) / 35098))
+loss = torch.nn.BCEWithLogitsLoss()
 loss.to(device)
 epochs = 5
 LR = 2e-5 #Learning rate
@@ -122,51 +153,57 @@ optimizer = torch.optim.AdamW(model.parameters(), LR, weight_decay = 1e-2)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience = 2, verbose = True)
 torch.backends.cudnn.benchmark = True
 
-for i in range(epochs):
-    model.train()
-    correct_predictions = 0
-    for batch_id, batch in enumerate(data_loader_train):
-        optimizer.zero_grad()
-        train_losses = []
-        with torch.cuda.amp.autocast():
-            ids = batch['ids'].to(device)
-            mask = batch['mask'].to(device)
-            optimizer.zero_grad()
-            outputs = model(ids, mask)
-            outputs = outputs['logits'].squeeze(-1).to(torch.float32)
-            probabilities = torch.sigmoid(outputs)
-            predictions = torch.where(probabilities > 0.5, 1, 0)
-            labels = batch['labels'].to(device, non_blocking=True)
-            loss_value = loss(outputs, labels)
-            train_losses.append(loss_value.item())
-            loss_value.backward()
-            correct_predictions += torch.sum(predictions == labels)
-        optimizer.step()
-        if batch_id % 10 == 0:
-            print('Epoch: {}, Batch: {}, Loss: {}'.format(i, batch_id, np.mean(train_losses)))
-    accuracy = correct_predictions/(len(dataset_train)*6)
-    print('Epoch: {}, Accuracy: {}'.format(i, accuracy))
-    model.eval()
-    torch.save(model.state_dict(), '/srv/scratch/z5236447/comp9444/model_save/{}.pkl'.format(i))
-    # test
-    with torch.no_grad():
-        correct_predictions = 0
-        test_losses = []
-        for batch_id, batch in enumerate(data_loader_test):
-            ids = batch['ids'].to(device)
-            mask = batch['mask'].to(device)
-            outputs = model(ids, mask)
-            outputs = outputs['logits'].squeeze(-1).to(torch.float32)
-            probabilities = torch.sigmoid(outputs)
-            predictions = torch.where(probabilities > 0.5, 1, 0)
-            labels = batch['labels'].to(device, non_blocking=True)
-            loss_valid = loss(outputs, labels)
-            test_losses.append(loss_valid.item())
-            correct_predictions += torch.sum(predictions == labels)
-        accuracy = correct_predictions/(len(dataset_test)*6)
-        print('Epoch: {}, Validation Accuracy: {}, loss: {}'.format(i, accuracy, np.mean(test_losses)))
-        if accuracy > 0.97:
-            break
-#print(torch.cuda.memory_summary(1))
+model.load_state_dict(torch.load('/srv/scratch/z5236447/comp9444/model_save/0.pkl'))
 
+
+labels_total = None
+predictions_total = None
+label_counter = 0
+pred_counter = 0
+with torch.no_grad():
+	correct_predictions = 0
+	test_losses = []
+	for batch_id, batch in enumerate(data_loader_test):
+		ids = batch['ids'].to(device)
+		mask = batch['mask'].to(device)
+		outputs = model(ids, mask)
+		outputs = outputs['logits'].squeeze(-1).to(torch.float32)
+		probabilities = torch.sigmoid(outputs)
+		predictions = torch.where(probabilities > 0.5, 1, 0)
+		labels = batch['labels'].to(device, non_blocking=True)
+		loss_valid = loss(outputs, labels)
+		#print("prediction shape: ", predictions)
+		#print("labels shape: ", labels.to(torch.int))
+		#recall_score = recall(labels.to(torch.int), predictions.to(torch.int))
+		#print("recall_score", recall_score)
+		test_losses.append(loss_valid.item())
+		correct_predictions += torch.sum(predictions == labels)
+		
+		labels = labels.to(torch.device("cpu")).numpy()
+		predictions = predictions.to(torch.device("cpu")).numpy()
+		for row in range(len(labels)):
+			for col in range(len(labels[row])):
+				if labels[row][col] == 1:
+					label_counter += 1
+					if predictions[row][col] == 1:
+						pred_counter += 1
+		'''
+		if labels_total == None:
+			labels_total = labels
+		else:
+			labels_total = torch.cat((labels_total, labels), 0)
+		if predictions_total == None:
+			predictions_total = predictions
+		else:
+			predictions_total = torch.cat((predictions_total, predictions), 0)
+		'''
+		
+	accuracy = correct_predictions/(len(dataset_test)*6)
+	recall_score = pred_counter / label_counter
+	#recall_score = recall(labels_total.to(torch.int), predictions_total.to(torch.int))
+	print("recall_score", recall_score)
+	#f1_score = f1(labels_total.to(torch.int), predictions_total.to(torch.int))
+	#print("f1", f1_score)
+	print('Validation Accuracy: {}, loss: {}'.format(accuracy, np.mean(test_losses)))
+	
 
