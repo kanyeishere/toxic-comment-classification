@@ -11,6 +11,10 @@ import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 import os
+
+from nltk.corpus import wordnet
+from nltk.corpus import stopwords
+
 ## Data Loading
 
 data_folder_path = './data/'
@@ -44,9 +48,51 @@ def data_cleaning(text):
     return decode_string
 df['clean_comment'] = df['comment_text'].apply(data_cleaning)
 test_data['clean_comment'] = test_data['comment_text'].apply(data_cleaning)
+## augmenting data
+toxic_df = df[(df['toxic'] == 1) | (df['severe_toxic'] == 1) | (df['obscene'] == 1) | (df['threat'] == 1) | (df['insult'] == 1) | (df['identity_hate'] == 1)]
+non_toxic_df = df[(df['toxic'] == 0) & (df['severe_toxic'] == 0) & (df['obscene'] == 0) & (df['threat'] == 0) & (df['insult'] == 0) & (df['identity_hate'] == 0)]
+
+replacement_rate =0.7
+##  synonym replacement
+aug_toxic_df = toxic_df.copy(True)
+for i, row in toxic_df.iterrows():
+    comment = row['clean_comment']
+    words = comment.split()
+    new_comment = ''
+    new_words = []
+    for word in words:
+        if word in stopwords.words('english'):
+            new_words.append(word)
+            continue
+
+        random_rate = np.random.uniform(0, 1)
+
+        if random_rate < replacement_rate:
+            synonyms = []
+            for syn in wordnet.synsets(word):
+                for l in syn.lemmas():
+                    synonyms.append(l.name())
+            if len(synonyms) > 0:
+                new_word = synonyms[np.random.randint(0, len(synonyms))]
+                new_words.append(new_word)
+            else:
+                new_words.append(word)
+
+
+        else:
+            new_words.append(word)
+    new_comment = ' '.join(new_words)
+    new_row = row.copy(True)
+    new_row['clean_comment'] = new_comment
+    aug_toxic_df = aug_toxic_df.append(new_row, ignore_index=True)
+
+
+df_no_aug = df.copy(True)
+df_aug = pd.concat([aug_toxic_df, non_toxic_df], ignore_index=True)
+
 ## Tokenization
 seed = 42
-train_df, valid_df = train_test_split(df, test_size=0.2, random_state=seed)
+train_df = df_no_aug
 train_df.head()
 tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-cased')
 # encoded_comment = [tokenizer.encode(sent, add_special_tokens=True) for sent in train_df['clean_comment']]
@@ -79,15 +125,13 @@ class BertDataSet(Dataset):
         return {'ids': ids, 'mask': mask, 'labels': labels}
 
 dataset_train = BertDataSet(train_df)
-dataset_test = BertDataSet(valid_df)
-len(dataset_train), len(dataset_test)
-for td in dataset_test:
-    print(td['ids'].shape, td['mask'].shape, td['labels'].shape)
-    break
-train_batch = 48
-test_batch = 48
+# dataset_test = BertDataSet(valid_df)
+# len(dataset_train), len(dataset_test)
+
+train_batch = 52
+test_batch = 52
 data_loader_train = DataLoader(dataset_train, batch_size=train_batch, shuffle=True, pin_memory = True)
-data_loader_test = DataLoader(dataset_test, batch_size=test_batch, shuffle=False, pin_memory = True)
+# data_loader_test = DataLoader(dataset_test, batch_size=test_batch, shuffle=False, pin_memory = True)
 model = transformers.BertForSequenceClassification.from_pretrained('bert-base-cased', num_labels = 6)
 gpus = torch.cuda.device_count()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -96,25 +140,10 @@ if gpus > 1:
     print("Let's use", gpus, "GPUs!")
     model = torch.nn.DataParallel(model)    # multi-gpu
 model.to(device)
+# loss = torch.nn.BCEWithLogitsLoss(pos_weight = torch.tensor((159571 - 35098) / 35098))
 loss = torch.nn.BCEWithLogitsLoss()
 loss.to(device)
-for batch in data_loader_train:
-    ids = batch['ids'].to(device)
-    mask = batch['mask'].to(device)
-    outputs = model(ids, attention_mask=mask)
-    outputs = outputs['logits'].squeeze(-1).to(torch.float32)
-    probabilities = torch.sigmoid(outputs)
-    predictions = torch.where(probabilities > 0.5, 1, 0)
-    labels = batch['labels'].to(device, non_blocking=True)
-    loss_value = loss(outputs, labels)
-    print(loss_value.item())
-    correct_predictions = torch.sum(predictions == labels)
-    print(correct_predictions.item())
-    break
 
-
-loss = torch.nn.BCEWithLogitsLoss()
-loss.to(device)
 epochs = 5
 LR = 2e-5 #Learning rate
 optimizer = torch.optim.AdamW(model.parameters(), LR, weight_decay = 1e-2)
@@ -147,25 +176,23 @@ for i in range(epochs):
     print('Epoch: {}, Accuracy: {}'.format(i, accuracy))
     model.eval()
     # test
-    with torch.no_grad():
-        correct_predictions = 0
-        test_losses = []
-        for batch_id, batch in enumerate(data_loader_test):
-            ids = batch['ids'].to(device)
-            mask = batch['mask'].to(device)
-            outputs = model(ids, mask)
-            outputs = outputs['logits'].squeeze(-1).to(torch.float32)
-            probabilities = torch.sigmoid(outputs)
-            predictions = torch.where(probabilities > 0.5, 1, 0)
-            labels = batch['labels'].to(device, non_blocking=True)
-            loss_valid = loss(outputs, labels)
-            test_losses.append(loss_valid.item())
-            correct_predictions += torch.sum(predictions == labels)
-        accuracy = correct_predictions/(len(dataset_test)*6)
-        print('Epoch: {}, Validation Accuracy: {}, loss: {}'.format(i, accuracy, np.mean(test_losses)))
-        if accuracy > 0.97:
-            break
-    torch.save(model.state_dict(), './model_save/{}.pkl'.format(epochs))
+    #with torch.no_grad():
+    #    correct_predictions = 0
+    #    test_losses = []
+    #    for batch_id, batch in enumerate(data_loader_test):
+    #        ids = batch['ids'].to(device)
+    #        mask = batch['mask'].to(device)
+    #        outputs = model(ids, mask)
+    #        outputs = outputs['logits'].squeeze(-1).to(torch.float32)
+    #        probabilities = torch.sigmoid(outputs)
+    #        predictions = torch.where(probabilities > 0.5, 1, 0)
+    #        labels = batch['labels'].to(device, non_blocking=True)
+    #        loss_valid = loss(outputs, labels)
+    #        test_losses.append(loss_valid.item())
+    #        correct_predictions += torch.sum(predictions == labels)
+    torch.save(model.state_dict(), './model_save/{}_aug_False_loss_False.pkl'.format(i))
+    #accuracy = correct_predictions/(len(dataset_test)*6)
+    #print('Epoch: {}, Validation Accuracy: {}, loss: {}'.format(i, accuracy, np.mean(test_losses)))
 print(torch.cuda.memory_summary(1))
 
 
