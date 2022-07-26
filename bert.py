@@ -92,7 +92,7 @@ df_aug = pd.concat([aug_toxic_df, non_toxic_df], ignore_index=True)
 
 ## Tokenization
 seed = 42
-train_df = df_no_aug
+train_df = df_aug
 train_df.head()
 tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-cased')
 # encoded_comment = [tokenizer.encode(sent, add_special_tokens=True) for sent in train_df['clean_comment']]
@@ -141,7 +141,7 @@ if gpus > 1:
     model = torch.nn.DataParallel(model)    # multi-gpu
 model.to(device)
 # loss = torch.nn.BCEWithLogitsLoss(pos_weight = torch.tensor((159571 - 35098) / 35098))
-loss = torch.nn.BCEWithLogitsLoss()
+loss = torch.nn.BCEWithLogitsLoss(pos_weight = torch.tensor((159571 - 35098) / 35098))
 loss.to(device)
 
 epochs = 5
