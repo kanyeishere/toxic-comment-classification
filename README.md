@@ -37,7 +37,7 @@ In this project, we adopt a real-world dataset: jigsaw-toxic- comment from Kaggl
 
 ![image](https://user-images.githubusercontent.com/82253442/182348812-46d83328-93ec-4e04-aeb5-3da6c017747c.png)
 
-From the statistic of dataset, we can see this dataset is imbalance. The toxic comments have the proportion of 10.2%.
+From the statistic of dataset, we can see this dataset is imbalance. The toxic comments have the proportion of 10.2%. The toxic comments in the dataset were divided into the six categories, above pie graph shows how they are represented.
 
 ## Data Augmentation
 Data augment is necessary for the imbalanced dataset. We used Natural language toolkit performed 50% synonym replacement and stopwords removal on the data.
