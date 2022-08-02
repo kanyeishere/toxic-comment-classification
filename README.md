@@ -28,12 +28,11 @@ Data augment is necessary for the imbalanced dataset. We used Natural language t
 ## Data generation framework:
 <img width="494" alt="image" src="https://user-images.githubusercontent.com/82253442/182352301-042f2e05-94bf-48c0-bbb3-1f42e4e10222.png">
 
+After apply data generation, we feed training data into LSTM (data generation) model for training to predict the following sentences by a given short sentence or a word. We use it to predict the missing sentences in test datasets and supplement the training data with more for balance, and feed these new text with original text together into our another LSTM classifier to make predictions. But because of time constraints, we didn’t finish this work yet, Here we consider this solution as an extension of our project.
 
 ## Class-Balanced Loss Weight
 
 ![image](https://user-images.githubusercontent.com/82253442/182350591-13a60127-5b28-4e86-8efa-e1241e9a6fe4.png)
-
-After apply data generation, we feed training data into LSTM (data generation) model for training to predict the following sentences by a given short sentence or a word. We use it to predict the missing sentences in test datasets and supplement the training data with more for balance, and feed these new text with original text together into our another LSTM classifier to make predictions. But because of time constraints, we didn’t finish this work yet, Here we consider this solution as an extension of our project.
 
 To counter the issue of the imbalanced dataset, we modify the weight hyper parameter in the loss function, which gives weight to positive samples for each class. To find a suitable weight, we apply the method proposed by the paper [https://arxiv.org/abs/1901.05555], which is based on the effective number of samples, is used to handle the imbalance. The weights for each class in the loss function are calculated with (1 − β)/(1 − βn) where β = (N − 1)/N (we use 0.9999), and n is the size of samples in the class, N is total number of all classes.
 
