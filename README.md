@@ -17,7 +17,7 @@ A trial to train another LSTM model to generate new data to balance the training
 !!Note: Because there are too many result tables, we merge them together and make some comparision graphs in readme.md. Please check the results and the related analysis here. More coding details and explainations can be found in above mentioned notebooks. Thanks.
 
 
-## Motivations:
+## Motivation:
 
 In recent years, online hate or offensive comments have proliferated on social media platforms and online discussions. It only takes one toxic word in online forums and social platforms to sour an online discussion on the web. Toxic comments are harming all social platforms.
 
