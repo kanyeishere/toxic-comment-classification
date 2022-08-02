@@ -2,9 +2,9 @@
 
 ## Introdction of Notebooks: 
 
-fine-tuned the pre-trained BERT model on the comments datase: bert_notebook.ipynb 
+Fine-tuned the pre-trained BERT model on the comments datase: bert_notebook.ipynb 
 
-Wihtout data augmentation and balanced weighted loss, our baseline of Bi-LSTM: glove_bi-lstm.ipynb 
+Without data augmentation and balanced weighted loss, our baseline of Bi-LSTM: glove_bi-lstm.ipynb 
 
 Apply balanced weighted loss on Bi-LSTM on binary classification task: glove_bi-lstm_binary.ipynb
 
