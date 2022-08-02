@@ -1,5 +1,18 @@
 # toxic-comment-classification
 
+## Data statistics:
+
+<img width="245" alt="image" src="https://user-images.githubusercontent.com/82253442/182348639-77ac8531-2f48-4b64-8c86-5c516ea616d8.png">
+
+![image](https://user-images.githubusercontent.com/82253442/182348812-46d83328-93ec-4e04-aeb5-3da6c017747c.png)
+
+## Class-Balanced Loss Weight
+
+![image](https://user-images.githubusercontent.com/82253442/182350591-13a60127-5b28-4e86-8efa-e1241e9a6fe4.png)
+
+To counter the issue of the imbalanced dataset, we modify the weight hyper parameter in the loss function, which gives weight to positive samples for each class. To find a suitable weight, we apply the method proposed by the paper [https://arxiv.org/abs/1901.05555], which is based on the effective number of samples, is used to handle the imbalance. The weights for each class in the loss function are calculated with (1 − β)/(1 − βn) where β = (N − 1)/N (we use 0.9999), and n is the size of samples in the class, N is total number of all classes.
+
+
 ## Experimental Results:
 Here, we report our experimental results and we aim to answer the two questions we asked before our experiments:
 
