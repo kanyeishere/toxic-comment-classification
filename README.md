@@ -26,3 +26,16 @@ Question 2: Is our Bi-LSTM model lighter than the BERT pre-trained model?
 #### F1-score:
 
 <img width="555" alt="image" src="https://user-images.githubusercontent.com/82253442/182347002-76284708-7110-4d3f-b1f9-d6541f5a145b.png">
+
+## Analysis:
+
+The comparison of the precision of different models on multi-class classification task.We mark the Bi-LSTM with balanced loss weight and data augmentation as black curve and BERT as blue curve. We can see that in some labels like severe toxic, threat, insult, LSTM with balance weight and data augmentation has higher precision. 
+
+By comparing the recall of different models. We can see the LSTM model improved significantly with the application of data augmentation and weighted loss function. While these techniques make little difference on BERT, so we didn't plot the results of BERT with these techniques on above graphs.
+
+Bert has the highest recall in the majority labels. But the recall of LSTM with balance weight data and data augmentation is very close to the bert implementation, even better on detecting identity hate text.
+
+The accuracy of all above models with data augmentation and balanced loss weight are around 0.97. But because we use imbalanced data, we care F1-score more than accuracy(accuracy is a weak evaluation metric for imbalanced data). And we can see that the overall F1 scores of bert and our lstm are very close, lstm can even beat bert on some certain labels. Which prove that the overall performance of our bi-lstm is neck to neck to BERT.
+
+
+
