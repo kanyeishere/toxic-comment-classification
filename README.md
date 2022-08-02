@@ -80,9 +80,9 @@ In our opinion, pre-trained models should only be used as a baseline method or i
 
 For future work 
 
-- More data augmentation   Rephrase, translate it to another language and back to english.
-- Data generation  LSTM GAN etc
-- Word embedding self traiend embedding rather than pre-trained embedding 
+- More data augmentation - Rephrase, translate it to another language and back to english.
+- Data generation - LSTM GAN etc
+- Word embedding - self traiend embedding rather than pre-trained embedding 
 - Loss function and Pseudo-Labeling
 - Ensemble method
 
