@@ -14,7 +14,7 @@ Apply data augmentation and balanced weighted loss on Bi-LSTM on muti-classifica
 
 A trial to train another LSTM model to generate new data to balance the training dataset and supplement the imcomplete text in test dataset: glove_bi-lstm_data_generation.ipynb
 
-!!Note: Because there are too many result tables, we merge them together and make some comparoision graph in readme.md. Please check the results and related analysis here. Thanks
+!!Note: Because there are too many result tables, we merge them together and make some comparision graphs in readme.md. Please check the results and the related analysis here. Thanks.
 
 ## Data statistics:
 
