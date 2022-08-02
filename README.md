@@ -16,6 +16,13 @@ A trial to train another LSTM model to generate new data to balance the training
 
 !!Note: Because there are too many result tables, we merge them together and make some comparision graphs in readme.md. Please check the results and the related analysis here. Thanks.
 
+
+## Motivations:
+
+In recent years, online hate or offensive comments have proliferated on social media platforms and online discussions. It only takes one toxic word in online forums and social platforms to sour an online discussion on the web. Toxic comments are harming all social platforms.
+
+Thus it is essential to automatically detect and warn of toxic comments on social platforms and flag them for removal. In response, our project attempts to build two models to detect different toxicity types, each of which performs binary and multi-class classification. We first fine-tuned the pre-trained BERT model on the comments dataset from the Wikipedia discussion page editor. And then, we proposed a bi-direction LSTM model to approach the performance of our pre-trained Bert model. We observed that the pre-trained model is not better than the simple model in all metrics.
+
 ## Data source:
 Our data comes from: https://www.kaggle.com/competitions/jigsaw-toxic-comment-classification-challenge/data
 
