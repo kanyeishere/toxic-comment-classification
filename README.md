@@ -27,7 +27,7 @@ Question 2: Is our Bi-LSTM model lighter than the BERT pre-trained model?
 
 <img width="555" alt="image" src="https://user-images.githubusercontent.com/82253442/182347002-76284708-7110-4d3f-b1f9-d6541f5a145b.png">
 
-## Analysis:
+### Analysis:
 
 The comparison of the precision of different models on multi-class classification task.We mark the Bi-LSTM with balanced loss weight and data augmentation as black curve and BERT as blue curve. We can see that in some labels like severe toxic, threat, insult, LSTM with balance weight and data augmentation has higher precision. 
 
