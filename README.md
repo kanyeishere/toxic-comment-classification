@@ -88,7 +88,7 @@ Bert has the highest recall in the majority labels. But the recall of LSTM with 
 
 The accuracy of all above models with data augmentation and balanced loss weight are around 0.97. But because we use imbalanced data, we care F1-score more than accuracy(accuracy is a weak evaluation metric for imbalanced data). And we can see that the overall F1 scores of bert and our lstm are very close, lstm can even beat bert on some certain labels. Which prove that the overall performance of our bi-lstm is neck to neck to BERT.
 
-## Conclusion and Future Work
+## Conclusion and Future Work (Discussion)
 
 In conclusion, The self-developed LSTM-based network performs neck to neck with the  BERT pre-trained models with extended tuning and pre-trained word embedding. Which is a surprise considering the current hype that pre-trained models received.
 
