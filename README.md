@@ -6,6 +6,12 @@
 
 ![image](https://user-images.githubusercontent.com/82253442/182348812-46d83328-93ec-4e04-aeb5-3da6c017747c.png)
 
+## Data Augmentation
+Data augment is necessary for the imbalanced dataset. We used Natural language toolkit performed 50% synonym replacement and stopwords removal on the data.
+
+<img width="445" alt="image" src="https://user-images.githubusercontent.com/82253442/182352067-440f9af8-3101-4ee8-8cfa-b869850ffd61.png">
+
+
 ## Class-Balanced Loss Weight
 
 ![image](https://user-images.githubusercontent.com/82253442/182350591-13a60127-5b28-4e86-8efa-e1241e9a6fe4.png)
@@ -49,6 +55,9 @@ By comparing the recall of different models. We can see the LSTM model improved 
 Bert has the highest recall in the majority labels. But the recall of LSTM with balance weight data and data augmentation is very close to the bert implementation, even better on detecting identity hate text.
 
 The accuracy of all above models with data augmentation and balanced loss weight are around 0.97. But because we use imbalanced data, we care F1-score more than accuracy(accuracy is a weak evaluation metric for imbalanced data). And we can see that the overall F1 scores of bert and our lstm are very close, lstm can even beat bert on some certain labels. Which prove that the overall performance of our bi-lstm is neck to neck to BERT.
+
+## Data generation framework:
+<img width="494" alt="image" src="https://user-images.githubusercontent.com/82253442/182352301-042f2e05-94bf-48c0-bbb3-1f42e4e10222.png">
 
 
 
