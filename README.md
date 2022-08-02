@@ -1,5 +1,19 @@
 # toxic-comment-classification
 
+## Introdction of Notebooks: 
+
+fine-tuned the pre-trained BERT model on the comments datase: bert_notebook.ipynb 
+
+Wihtout data augmentation and balanced weighted loss, our baseline of Bi-LSTM: glove_bi-lstm.ipynb 
+
+Apply balanced weighted loss on Bi-LSTM on binary classification task: glove_bi-lstm_binary.ipynb
+
+Freeze the LSTM layers and only allow the downstream full-connection layers to update their parameters: glove_bi-lstm_freeze_lstm_layers.ipynb
+
+Apply data augmentation and balanced weighted loss on Bi-LSTM on muti-classification task: glove_bi-lstm_muti_class.ipynb
+
+A trial to train another LSTM model to generate new data to balance the training dataset and supplement the imcomplete text in test dataset: glove_bi-lstm_data_generation.ipynb
+
 ## Data statistics:
 
 <img width="245" alt="image" src="https://user-images.githubusercontent.com/82253442/182348639-77ac8531-2f48-4b64-8c86-5c516ea616d8.png">
