@@ -28,6 +28,9 @@ Our data comes from: https://www.kaggle.com/competitions/jigsaw-toxic-comment-cl
 
 In this project, we adopt a real-world dataset: jigsaw-toxic- comment from Kaggle, which is a collection of Wikipedia comments labelled manually for toxic behaviour 1. The toxic labels are in 6 categories which are toxic, severe toxic, obscene, threat, insult and identity hate.
 
+<img width="304" alt="image" src="https://user-images.githubusercontent.com/82253442/182391234-fb8d84ac-b297-40b0-b2a5-5904bee6d6c5.png">
+
+
 ## Data statistics:
 
 <img width="245" alt="image" src="https://user-images.githubusercontent.com/82253442/182348639-77ac8531-2f48-4b64-8c86-5c516ea616d8.png">
